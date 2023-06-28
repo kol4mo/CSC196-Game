@@ -1,10 +1,16 @@
+#include "Core/Random.h"
+#include "Core/FileIO.h"
 #include <iostream>
+
+using namespace std;
 
 int main()
 {
-#ifdef _DEBUG 
-	std::cout << "debug!\n";
-#endif
+	cout << hop::getFilePath() << endl;
 
-	std::cout << "hello world!\n";
+
+	hop::seedRandom((unsigned int)time(nullptr));
+	for (int i = 0; i < 3; i++) {
+		cout << hop::random(10, 20) << endl;
+	}
 }
