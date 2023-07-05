@@ -8,39 +8,23 @@
 
 using namespace std;
 
-int main()	
+int main(int argc, char* argv[])
 {
-	hop::g_memoryTracker.DisplayInfo();
-	int* p = new int;
-	hop::g_memoryTracker.DisplayInfo();
-	delete p;
-	hop::g_memoryTracker.DisplayInfo();
+	hop::Renderer renderer;
+	renderer.Initialize();
+	renderer.CreateWindow("CSC196", 800, 600);
 
-	hop::Time timer;
-	for (int i = 0; i < 1000000; i++) {
-		for (int i = 0; i < 1000000; i++) {}
+	while (true)
+	{
+		renderer.SetColor(0, 0, 0, 255);
+		renderer.BeginFrame();
+		//draw
+		for (int i = 0; 1 < 10000; i++) {
+			renderer.SetColor(hop::random(256), hop::random(256), hop::random(256), hop::random(256));
+			renderer.DrawPoint(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
+		}
+		renderer.EndFrame();
 	}
-	cout << timer.GetElapsedSeconds() << endl;
 
-	//auto start = std::chrono::high_resolution_clock::now();
-	//for (int i = 0; i < 2147483647; i++) {}
-	//auto end = std::chrono::high_resolution_clock::now();
-
-	//cout << std:: chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() << endl;
-
-	//cout << hop::getFilePath() << endl;
-	//hop::setFilePath("Assets");
-	//cout << hop::getFilePath() << endl;
-	//size_t size;
-	//hop::getFileSize("game.txt", size);
-	//cout << size << endl;
-
-	//std::string s;
-	//hop::readFile("game.txt", s);
-	//cout << s << endl;
-
-	//hop::seedRandom((unsigned int)time(nullptr));
-	//for (int i = 0; i < 3; i++) {
-	//	cout << hop::random(10, 20) << endl;
-	//}
+	return 0;
 }
