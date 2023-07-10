@@ -26,6 +26,12 @@ namespace hop
 		Vexctor2& operator -= (const Vexctor2& v) { x -= v.x; y -= v.y; return *this; }
 		Vexctor2& operator /= (const Vexctor2& v) { x /= v.x; y /= v.y; return *this; }
 		Vexctor2& operator *= (const Vexctor2& v) { x *= v.x; y *= v.y; return *this; }
+
+		float lengthSqr() { return (x * x) + (y * y); }
+		float length() { return sqrt(lengthSqr()); }
+
+		Vexctor2 Normalized() { return *this / length();}
+		void Normalize() { *this /= length(); }
 	};
 
 	using vec2 = Vexctor2;
