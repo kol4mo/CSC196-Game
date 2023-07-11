@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 
 
 		hop::Vexctor2 vel(1.5f, 0.1f);
-		model.Draw(renderer, position, 6);
+		model.Draw(renderer, position, 2);
 
 
 		for (auto& star : stars) {
