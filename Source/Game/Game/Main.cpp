@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
 	hop::Renderer renderer;
 	renderer.Initialize();
-	renderer.CreateWindow("CSC196", 800, 600);
+	renderer.CreateWindow("CSC196", 2048, 1024);
 
 	hop::InputSystem inputSystem;
 	inputSystem.Initialize();
@@ -51,15 +51,16 @@ int main(int argc, char* argv[])
 	std::vector<hop::vec2> points {{10, 5}, { 40,60 }, { 20,50 }, { 10, 5 }};
 	hop::Model model(points);
 
-	hop::vec2 v{ 5, 5};
-	v.Normalize();
-
 	for (int i = 0; i < 10000; i++) {
 		hop::Vexctor2 pos(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
 		hop::Vexctor2 vel(hop::randomf(1, 3), 0.0f);
 
 		stars.push_back(Star(pos, vel));
 	}
+
+	hop::vec2 position { 400, 300 };
+
+	//Main game loop
 	bool quit = false;
 	while (!quit)
 	{
@@ -69,7 +70,7 @@ int main(int argc, char* argv[])
 			quit = true;
 		}
 		if (inputSystem.GetMouseButtonDown(0)) {
-			cout << "mouse pressed" << endl;
+			cout << "left mouse pressed" << endl;
 		}
 		cout << inputSystem.GetMousePosition().x << " " << inputSystem.GetMousePosition().y << endl;
 
@@ -81,11 +82,16 @@ int main(int argc, char* argv[])
 		for (auto& star : stars) {
 
 			star.update(renderer.GetWidth(), renderer.GetHeight());
-			r = star.m_pos.x / (renderer.GetWidth() / 255); r %= 255; r = 255 - r;
-			g = star.m_pos.y / (renderer.GetHeight() / 255); g %= 255;
-			b = star.m_pos.x / (renderer.GetWidth() / 255); b %= 255;
+			r = sqrt(pow(abs(star.m_pos.x - inputSystem.GetMousePosition().x), 2) + pow(abs(star.m_pos.y - inputSystem.GetMousePosition().y), 2));
 
-			renderer.SetColor(r , b, g, 255);
+			if (r > 255) {
+				b = 0;
+			}
+			else {
+				b = 255 - r;
+			}
+
+			renderer.SetColor(b , b, b, 255);
 			star.Draw(renderer);
 		}
 		//draw
