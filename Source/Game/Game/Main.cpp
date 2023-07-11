@@ -1,6 +1,7 @@
 #include "Core/core.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Model.h"
+#include "Input/InputSystem.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -44,6 +45,9 @@ int main(int argc, char* argv[])
 	renderer.Initialize();
 	renderer.CreateWindow("CSC196", 800, 600);
 
+	hop::InputSystem inputSystem;
+	inputSystem.Initialize();
+
 	std::vector<hop::vec2> points {{10, 5}, { 40,60 }, { 20,50 }, { 10, 5 }};
 	hop::Model model(points);
 
@@ -56,9 +60,19 @@ int main(int argc, char* argv[])
 
 		stars.push_back(Star(pos, vel));
 	}
-
-	while (true)
+	bool quit = false;
+	while (!quit)
 	{
+		inputSystem.Update();
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
+		{
+			quit = true;
+		}
+		if (inputSystem.GetMouseButtonDown(0)) {
+			cout << "mouse pressed" << endl;
+		}
+		cout << inputSystem.GetMousePosition().x << " " << inputSystem.GetMousePosition().y << endl;
+
 		renderer.SetColor(0, 0, 0, 255); 
 		renderer.BeginFrame();
 		renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
