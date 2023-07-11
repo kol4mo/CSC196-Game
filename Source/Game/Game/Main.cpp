@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <thread>
 
 using namespace std;
 
@@ -18,9 +19,11 @@ public:
 
 	void update(int width, int height)
 	{
-		m_pos += m_vel;
-		if (m_pos.x >= width) m_pos.x = 0;
-		if (m_pos.y >= height) m_pos.y = 0;
+		m_pos += m_vel * hop::g_time.GetDeltaTime();
+		if (m_pos.x > width) m_pos.x = 0;
+		if (m_pos.y > height) m_pos.y = 0;
+		if (m_pos.x < 0) m_pos.x = width;
+		if (m_pos.y < 0) m_pos.y = height;
 	}
 
 	void Draw(hop::Renderer& renderer)
@@ -35,6 +38,7 @@ public :
 int main(int argc, char* argv[])
 {
 	hop::seedRandom((unsigned int)time(nullptr));
+	hop::setFilePath("Assets");
 
 	vector<Star> stars;
 	int r;
@@ -43,32 +47,46 @@ int main(int argc, char* argv[])
 
 	hop::Renderer renderer;
 	renderer.Initialize();
-	renderer.CreateWindow("CSC196", 2048, 1024);
+	renderer.CreateWindow("CSC196", 1920, 1080);
 
 	hop::InputSystem inputSystem;
 	inputSystem.Initialize();
 
-	std::vector<hop::vec2> points {{10, 5}, { 40,60 }, { 20,50 }, { 10, 5 }};
-	hop::Model model(points);
+	//std::vector<hop::vec2> points {{5, 0}, { 10,10 }, { 0,10 }, { 5, 0 }};
+	//hop::Model model(points);
+	hop::Model model;
+	model.Load("S.txt");
 
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 100000; i++) {
 		hop::Vexctor2 pos(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
-		hop::Vexctor2 vel(hop::randomf(1, 3), 0.0f);
+		hop::Vexctor2 vel(0.0f, hop::randomf(12, 15));
 
 		stars.push_back(Star(pos, vel));
 	}
 
 	hop::vec2 position { 400, 300 };
+	float speed = 100;
 
 	//Main game loop
 	bool quit = false;
 	while (!quit)
 	{
+
+		hop::g_time.tick();
 		inputSystem.Update();
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
 		{
 			quit = true;
 		}
+
+		hop::vec2 direction;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) direction.x = -1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_S)) direction.y = 1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) direction.x = 1;
+
+		position += direction * speed * hop::g_time.GetDeltaTime();
+
 		if (inputSystem.GetMouseButtonDown(0)) {
 			cout << "left mouse pressed" << endl;
 		}
@@ -77,12 +95,16 @@ int main(int argc, char* argv[])
 		renderer.SetColor(0, 0, 0, 255); 
 		renderer.BeginFrame();
 		renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
+
+
 		hop::Vexctor2 vel(1.5f, 0.1f);
-		model.Draw(renderer, {200, 300}, 2);
+		model.Draw(renderer, position, 6);
+
+
 		for (auto& star : stars) {
 
 			star.update(renderer.GetWidth(), renderer.GetHeight());
-			r = sqrt(pow(abs(star.m_pos.x - inputSystem.GetMousePosition().x), 2) + pow(abs(star.m_pos.y - inputSystem.GetMousePosition().y), 2));
+			r = sqrt(pow(abs(star.m_pos.x - position.x), 2) + pow(abs(star.m_pos.y - position.y), 2));
 
 			if (r > 255) {
 				b = 0;
@@ -102,6 +124,8 @@ int main(int argc, char* argv[])
 		//	//renderer.DrawLine(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()), hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
 		//}
 		renderer.EndFrame();
+
+		//this_thread::sleep_for(chrono::milliseconds(100));
 	}
 
 	return 0;
