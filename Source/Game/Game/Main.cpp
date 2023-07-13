@@ -37,6 +37,8 @@ public :
 
 int main(int argc, char* argv[])
 {
+	constexpr float a = hop::DegToRad(180.0f);
+
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
 
@@ -44,10 +46,12 @@ int main(int argc, char* argv[])
 	int r;
 	int g;
 	int b;
+	int d;
+	int o;
 
 	hop::Renderer renderer;
 	renderer.Initialize();
-	renderer.CreateWindow("CSC196", 1920, 1080);
+	renderer.CreateWindow("CSC196", 1080, 540);
 
 	hop::InputSystem inputSystem;
 	inputSystem.Initialize();
@@ -64,7 +68,8 @@ int main(int argc, char* argv[])
 		stars.push_back(Star(pos, vel));
 	}
 
-	hop::vec2 position { 400, 300 };
+	hop::Transform transform{ {400, 300}, 0, 3};
+	float turnrate = hop::DegToRad(180);
 	float speed = 100;
 
 	//Main game loop
@@ -79,13 +84,26 @@ int main(int argc, char* argv[])
 			quit = true;
 		}
 
-		hop::vec2 direction;
+		float rotate = 0;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) rotate = -1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) rotate = 1;
+		transform.rotation += rotate * turnrate * hop::g_time.GetDeltaTime();
+
+		float thrust = 0;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) thrust = 1;
+
+		hop::vec2 forward = hop::vec2{ 0, -1 }.Rotate(transform.rotation);
+		transform.position += forward * speed * thrust * hop::g_time.GetDeltaTime();
+		transform.position.x = hop::Wrap(transform.position.x, renderer.GetWidth());
+		transform.position.y = hop::Wrap(transform.position.y, renderer.GetHeight());
+
+		/*hop::vec2 direction;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) direction.x = -1;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_S)) direction.y = 1;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) direction.x = 1;
 
-		position += direction * speed * hop::g_time.GetDeltaTime();
+		transform.position += direction * speed * hop::g_time.GetDeltaTime();*/
 
 		if (inputSystem.GetMouseButtonDown(0)) {
 			cout << "left mouse pressed" << endl;
@@ -98,22 +116,43 @@ int main(int argc, char* argv[])
 
 
 		hop::Vexctor2 vel(1.5f, 0.1f);
-		model.Draw(renderer, position, 2);
+		model.Draw(renderer, transform.position,transform.rotation, transform.scale);
 
 
 		for (auto& star : stars) {
 
 			star.update(renderer.GetWidth(), renderer.GetHeight());
-			r = sqrt(pow(abs(star.m_pos.x - position.x), 2) + pow(abs(star.m_pos.y - position.y), 2));
-
-			if (r > 255) {
-				b = 0;
+			d = sqrt(pow(abs(star.m_pos.x - transform.position.x), 2) + pow(abs(star.m_pos.y - transform.position.y), 2));
+			r = hop::random(255);
+			b = hop::random(255);
+			g= hop::random(255);
+			
+			if (r - d < 0) {
+				r = 0;
 			}
 			else {
-				b = 255 - r;
+				r - d;
+			}
+			if (b - d < 0) {
+				b= 0;
+			}
+			else {
+				b- d;
+			}
+			if (g - d < 0) {
+				g = 0;
+			}
+			else {
+				g - d;
+			}
+			if (d < 0) {
+				o = 0;
+			}
+			else {
+				o = (100 - d) * 2.55f;
 			}
 
-			renderer.SetColor(b , b, b, 255);
+			renderer.SetColor(o,o,o, 255);
 			star.Draw(renderer);
 		}
 		//draw

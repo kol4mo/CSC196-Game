@@ -31,12 +31,28 @@ namespace hop
 		Vexctor2& operator *= (const Vexctor2& v) { x *= v.x; y *= v.y; return *this; }
 
 
-		float lengthSqr() { return (x * x) + (y * y); }
-		float length() { return sqrt(lengthSqr()); }
+		float lengthSqr() const { return (x * x) + (y * y); }
+		float length() const { return sqrt(lengthSqr()); }
 
-		Vexctor2 Normalized() { return *this / length();}
+		float DistanceSqr(const Vexctor2& v) const { return (v - *this).lengthSqr(); }
+		float Distance(const Vexctor2& v) const { return (v - *this).length(); }
+
+		Vexctor2 Normalized() const  { return *this / length();}
 		void Normalize() { *this /= length(); }
+
+		float Angle() const { return std::atan2f(y, x); }
+		Vexctor2 Rotate(float radians) const;
 	};
+
+	inline Vexctor2 Vexctor2::Rotate(float radians) const
+	{
+		float _x = x * std::cos(radians) - y * std::sin(radians);
+		float _y = x * std::sin(radians) + y * std::cos(radians);
+
+		return { _x, _y };
+	}
+
+
 
 	inline std::istream& operator >> (std::istream& stream, Vexctor2& v)
 	{
