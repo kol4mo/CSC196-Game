@@ -11,4 +11,24 @@ namespace hop
 	constexpr float DegToRad(float degrees) { return degrees * PI / 180.0f; }
 
 	constexpr int Wrap(int value, int max) { return (value % max) + ((value < 0) ? max : 0); }
+	//constexpr float Wrap(float value, float max) { return fmod(value, max) + ((value < 0) ? max : 0); }
+
+	template <typename T>
+	inline T Max(T a, T b)
+	{
+		return (a > b) ? a : b;
+	}
+
+	template <typename T>
+	inline T Min(T a, T b)
+	{
+		return (a < b) ? a : b;
+	}
+
+	template <typename T>
+	inline T Clamp(T value, T min, T max) {
+		if (min > max) std::swap(min, max);
+
+		return (value < min) ? min : (value > max) ? max : value;
+	}
 }

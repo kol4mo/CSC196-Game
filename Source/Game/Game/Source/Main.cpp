@@ -2,10 +2,12 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/Model.h"
 #include "Input/InputSystem.h"
+#include "Enemy.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <thread>
+#include "Player.h"
 
 using namespace std;
 
@@ -17,7 +19,7 @@ public:
 		m_vel{ vel }
 	{}
 
-	void update(int width, int height)
+	void update(float width, float height)
 	{
 		m_pos += m_vel * hop::g_time.GetDeltaTime();
 		if (m_pos.x > width) m_pos.x = 0;
@@ -37,7 +39,6 @@ public :
 
 int main(int argc, char* argv[])
 {
-	constexpr float a = hop::DegToRad(180.0f);
 
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
@@ -49,53 +50,50 @@ int main(int argc, char* argv[])
 	int d;
 	int o;
 
-	hop::Renderer renderer;
-	renderer.Initialize();
-	renderer.CreateWindow("CSC196", 1080, 540);
+	hop::g_renderer.Initialize();
+	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
 
-	hop::InputSystem inputSystem;
-	inputSystem.Initialize();
+	hop::g_inputSystem.Initialize();
 
 	//std::vector<hop::vec2> points {{5, 0}, { 10,10 }, { 0,10 }, { 5, 0 }};
 	//hop::Model model(points);
-	hop::Model model;
-	model.Load("S.txt");
+	hop::Model model({ {0, 0}, { 0,-1 } });
+	//model.Load("S.txt");
 
-	for (int i = 0; i < 100000; i++) {
-		hop::Vexctor2 pos(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
+	for (int i = 0; i < 10000; i++) {
+		hop::Vexctor2 pos(hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight()));
 		hop::Vexctor2 vel(0.0f, hop::randomf(12, 15));
 
 		stars.push_back(Star(pos, vel));
 	}
 
-	hop::Transform transform{ {400, 300}, 0, 3};
+	hop::Transform transform{{400, 300}, 0, 3};
 	float turnrate = hop::DegToRad(180);
 	float speed = 100;
 
+	Player player{ 100, hop::PI, {{400, 300}, 0, 3}, model};
+	std::vector<Enemy> enemies;
+	for (int i = 0; i < 10; i++) {
+		Enemy enemy{ 200, hop::PI, {{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomf(hop::TwoPi), 3}, model};
+		enemies.push_back(enemy);
+	}
 	//Main game loop
 	bool quit = false;
 	while (!quit)
 	{
 
+
+
 		hop::g_time.tick();
-		inputSystem.Update();
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
+		hop::g_inputSystem.Update();
+		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
 		{
 			quit = true;
 		}
 
-		float rotate = 0;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) rotate = -1;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) rotate = 1;
-		transform.rotation += rotate * turnrate * hop::g_time.GetDeltaTime();
+		player.Update(hop::g_time.GetDeltaTime());
+		for (auto& enemy : enemies) enemy.Update(hop::g_time.GetDeltaTime());
 
-		float thrust = 0;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) thrust = 1;
-
-		hop::vec2 forward = hop::vec2{ 0, -1 }.Rotate(transform.rotation);
-		transform.position += forward * speed * thrust * hop::g_time.GetDeltaTime();
-		transform.position.x = hop::Wrap(transform.position.x, renderer.GetWidth());
-		transform.position.y = hop::Wrap(transform.position.y, renderer.GetHeight());
 
 		/*hop::vec2 direction;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
@@ -105,24 +103,22 @@ int main(int argc, char* argv[])
 
 		transform.position += direction * speed * hop::g_time.GetDeltaTime();*/
 
-		if (inputSystem.GetMouseButtonDown(0)) {
+		if (hop::g_inputSystem.GetMouseButtonDown(0)) {
 			cout << "left mouse pressed" << endl;
 		}
-		cout << inputSystem.GetMousePosition().x << " " << inputSystem.GetMousePosition().y << endl;
+		cout << hop::g_inputSystem.GetMousePosition().x << " " << hop::g_inputSystem.GetMousePosition().y << endl;
 
-		renderer.SetColor(0, 0, 0, 255); 
-		renderer.BeginFrame();
-		renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
+		hop::g_renderer.SetColor(0, 0, 0, 255);
+		hop::g_renderer.BeginFrame();
 
 
 		hop::Vexctor2 vel(1.5f, 0.1f);
-		model.Draw(renderer, transform.position,transform.rotation, transform.scale);
 
 
 		for (auto& star : stars) {
 
-			star.update(renderer.GetWidth(), renderer.GetHeight());
-			d = sqrt(pow(abs(star.m_pos.x - transform.position.x), 2) + pow(abs(star.m_pos.y - transform.position.y), 2));
+			star.update(hop::g_renderer.GetWidth(), hop::g_renderer.GetHeight());
+			d = sqrt(pow(abs(star.m_pos.x - player.m_transform.position.x), 2) + pow(abs(star.m_pos.y - player.m_transform.position.y), 2));
 			r = hop::random(255);
 			b = hop::random(255);
 			g= hop::random(255);
@@ -152,9 +148,13 @@ int main(int argc, char* argv[])
 				o = (100 - d) * 2.55f;
 			}
 
-			renderer.SetColor(o,o,o, 255);
-			star.Draw(renderer);
+			hop::g_renderer.SetColor(o,o,o, 255);
+			star.Draw(hop::g_renderer);
 		}
+
+		hop::g_renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
+		player.Draw(hop::g_renderer);
+		for (auto& enemy : enemies) enemy.Draw(hop::g_renderer);
 		//draw
 		//for (int i = 0; i < 1000; i++) {
 		//	hop::Vexctor2 pos(hop::randomf(renderer.GetWidth()), hop::randomf(renderer.GetHeight()));
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
 		//	renderer.DrawPoint(pos.x, pos.y);
 		//	//renderer.DrawLine(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()), hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
 		//}
-		renderer.EndFrame();
+		hop::g_renderer.EndFrame();
 
 		//this_thread::sleep_for(chrono::milliseconds(100));
 	}
