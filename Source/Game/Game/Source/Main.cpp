@@ -3,11 +3,12 @@
 #include "Renderer/Model.h"
 #include "Input/InputSystem.h"
 #include "Enemy.h"
+#include "Audio/AudioSystem.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <thread>
-#include "Player.h"
+#include "Player.h"	
 
 using namespace std;
 
@@ -52,8 +53,9 @@ int main(int argc, char* argv[])
 
 	hop::g_renderer.Initialize();
 	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
-
+	hop::g_audioSystem.Initialize();
 	hop::g_inputSystem.Initialize();
+	hop::g_audioSystem.AddAudio("explode", "explode.wav");
 
 	//std::vector<hop::vec2> points {{5, 0}, { 10,10 }, { 0,10 }, { 5, 0 }};
 	//hop::Model model(points);
@@ -86,15 +88,19 @@ int main(int argc, char* argv[])
 
 		hop::g_time.tick();
 		hop::g_inputSystem.Update();
+		hop::g_audioSystem.Update();
 		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
 		{
 			quit = true;
 		}
+		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !hop::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE))
+		{
+			hop::g_audioSystem.PlayOneShot("explode");
+		}
 
 		player.Update(hop::g_time.GetDeltaTime());
 		for (auto& enemy : enemies) enemy.Update(hop::g_time.GetDeltaTime());
-
-
+		
 		/*hop::vec2 direction;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) direction.x = -1;
