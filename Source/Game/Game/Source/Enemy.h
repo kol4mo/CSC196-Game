@@ -1,7 +1,7 @@
 #pragma once
-#include "Actor.h"
+#include "Framework/Actor.h"
 
-class Enemy : public Actor
+class Enemy : public hop::Actor
 {
 public:
 	Enemy(float speed, float turnRate, const hop::Transform& transform, const hop::Model& model) :

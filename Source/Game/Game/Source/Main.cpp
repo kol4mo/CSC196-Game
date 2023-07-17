@@ -4,11 +4,13 @@
 #include "Input/InputSystem.h"
 #include "Enemy.h"
 #include "Audio/AudioSystem.h"
+#include "Player.h"	
+#include "Framework/Scene.h"
+
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <thread>
-#include "Player.h"	
 
 using namespace std;
 
@@ -44,12 +46,12 @@ int main(int argc, char* argv[])
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
 
-	vector<Star> stars;
-	int r;
-	int g;
-	int b;
-	int d;
-	int o;
+	//vector<Star> stars;
+	//int r;
+	//int g;
+	//int b;
+	//int d;
+	//int o;
 
 	hop::g_renderer.Initialize();
 	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
@@ -58,26 +60,24 @@ int main(int argc, char* argv[])
 	hop::g_audioSystem.AddAudio("explode", "explode.wav");
 
 	//std::vector<hop::vec2> points {{5, 0}, { 10,10 }, { 0,10 }, { 5, 0 }};
-	//hop::Model model(points);
-	hop::Model model({ {0, 0}, { 0,-1 } });
-	//model.Load("S.txt");
+	hop::Model model;
+	//hop::Model model({ {0, 0}, { 0,-1 } });
+	model.Load("S.txt");
 
-	for (int i = 0; i < 10000; i++) {
-		hop::Vexctor2 pos(hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight()));
-		hop::Vexctor2 vel(0.0f, hop::randomf(12, 15));
+	//for (int i = 0; i < 10000; i++) {
+	//	hop::Vexctor2 pos(hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight()));
+	//	hop::Vexctor2 vel(0.0f, hop::randomf(12, 15));
 
-		stars.push_back(Star(pos, vel));
-	}
+	//	stars.push_back(Star(pos, vel));
+	//}
 
-	hop::Transform transform{{400, 300}, 0, 3};
-	float turnrate = hop::DegToRad(180);
-	float speed = 100;
+	hop::Scene scene;
 
-	Player player{ 100, hop::PI, {{400, 300}, 0, 3}, model};
+	scene.Add(new Player{ 100, hop::PI, {{400, 300}, 0, 20}, model });
+
 	std::vector<Enemy> enemies;
 	for (int i = 0; i < 10; i++) {
-		Enemy enemy{ 200, hop::PI, {{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomf(hop::TwoPi), 3}, model};
-		enemies.push_back(enemy);
+		scene.Add(new Enemy{ 200, hop::PI, {{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomf(hop::TwoPi), 3}, model });
 	}
 	//Main game loop
 	bool quit = false;
@@ -98,8 +98,7 @@ int main(int argc, char* argv[])
 			hop::g_audioSystem.PlayOneShot("explode");
 		}
 
-		player.Update(hop::g_time.GetDeltaTime());
-		for (auto& enemy : enemies) enemy.Update(hop::g_time.GetDeltaTime());
+		scene.Update(hop::g_time.GetDeltaTime());
 		
 		/*hop::vec2 direction;
 		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
@@ -121,7 +120,7 @@ int main(int argc, char* argv[])
 		hop::Vexctor2 vel(1.5f, 0.1f);
 
 
-		for (auto& star : stars) {
+		/*for (auto& star : stars) {
 
 			star.update(hop::g_renderer.GetWidth(), hop::g_renderer.GetHeight());
 			d = sqrt(pow(abs(star.m_pos.x - player.m_transform.position.x), 2) + pow(abs(star.m_pos.y - player.m_transform.position.y), 2));
@@ -156,11 +155,10 @@ int main(int argc, char* argv[])
 
 			hop::g_renderer.SetColor(o,o,o, 255);
 			star.Draw(hop::g_renderer);
-		}
+		}*/
 
 		hop::g_renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
-		player.Draw(hop::g_renderer);
-		for (auto& enemy : enemies) enemy.Draw(hop::g_renderer);
+		scene.Draw(hop::g_renderer);
 		//draw
 		//for (int i = 0; i < 1000; i++) {
 		//	hop::Vexctor2 pos(hop::randomf(renderer.GetWidth()), hop::randomf(renderer.GetHeight()));
