@@ -10,7 +10,7 @@ namespace hop
 	constexpr float RadToDeg(float radians) { return radians * 180.0f / PI; }
 	constexpr float DegToRad(float degrees) { return degrees * PI / 180.0f; }
 
-	constexpr int Wrap(int value, int max) { return (value % max) + ((value < 0) ? max : 0); }
+	constexpr int Wrap(int value, int max) { return (value % max) + ((value < 0) ? max : 0);	}
 	//constexpr float Wrap(float value, float max) { return fmod(value, max) + ((value < 0) ? max : 0); }
 
 	template <typename T>

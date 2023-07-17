@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include "MathUtils.h"
 
 namespace hop
 {
@@ -10,5 +11,18 @@ namespace hop
 
 	inline float randomf() { return (float)random() / RAND_MAX; }
 	inline float randomf(float max) { return randomf() * max; }
-	inline 	float randomf(float min, float max) { return (min + randomf()) * (max-min); }
+	inline float randomf(float min, float max) { return (min + randomf()) * (max-min); }
+	inline float randomDir() {
+		int temp = random(4);
+		switch (temp) {
+		case 0:
+			return halfPi;
+		case 1:
+			return PI;
+		case 2:
+			return halfPi + PI;
+		case 3:
+			return TwoPi;
+		}
+	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/core.h"
 #include "Renderer/Model.h"
+#include "Scene.h"
 
 namespace hop
 {

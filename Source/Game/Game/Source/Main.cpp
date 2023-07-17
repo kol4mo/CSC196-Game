@@ -46,12 +46,6 @@ int main(int argc, char* argv[])
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
 
-	//vector<Star> stars;
-	//int r;
-	//int g;
-	//int b;
-	//int d;
-	//int o;
 
 	hop::g_renderer.Initialize();
 	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
@@ -59,25 +53,17 @@ int main(int argc, char* argv[])
 	hop::g_inputSystem.Initialize();
 	hop::g_audioSystem.AddAudio("explode", "explode.wav");
 
-	//std::vector<hop::vec2> points {{5, 0}, { 10,10 }, { 0,10 }, { 5, 0 }};
 	hop::Model model;
-	//hop::Model model({ {0, 0}, { 0,-1 } });
 	model.Load("S.txt");
 
-	//for (int i = 0; i < 10000; i++) {
-	//	hop::Vexctor2 pos(hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight()));
-	//	hop::Vexctor2 vel(0.0f, hop::randomf(12, 15));
-
-	//	stars.push_back(Star(pos, vel));
-	//}
 
 	hop::Scene scene;
 
-	scene.Add(new Player{ 100, hop::PI, {{400, 300}, 0, 20}, model });
+	scene.Add(new Player{ 300, 0, {{400, 300}, 0, 6}, model });
 
 	std::vector<Enemy> enemies;
 	for (int i = 0; i < 10; i++) {
-		scene.Add(new Enemy{ 200, hop::PI, {{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomf(hop::TwoPi), 3}, model });
+		scene.Add(new Enemy{ 200, 0, {{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomDir(), 3}, model });
 	}
 	//Main game loop
 	bool quit = false;
@@ -100,13 +86,6 @@ int main(int argc, char* argv[])
 
 		scene.Update(hop::g_time.GetDeltaTime());
 		
-		/*hop::vec2 direction;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) direction.x = -1;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_S)) direction.y = 1;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) direction.x = 1;
-
-		transform.position += direction * speed * hop::g_time.GetDeltaTime();*/
 
 		if (hop::g_inputSystem.GetMouseButtonDown(0)) {
 			cout << "left mouse pressed" << endl;
@@ -120,6 +99,42 @@ int main(int argc, char* argv[])
 		hop::Vexctor2 vel(1.5f, 0.1f);
 
 
+
+		hop::g_renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
+		scene.Draw(hop::g_renderer);
+		hop::g_renderer.EndFrame();
+
+	}
+
+	return 0;
+}
+	//vector<Star> stars;
+	//int r;
+	//int g;
+	//int b;
+	//int d;
+	//int o;
+	//for (int i = 0; i < 10000; i++) {
+	//	hop::Vexctor2 pos(hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight()));
+	//	hop::Vexctor2 vel(0.0f, hop::randomf(12, 15));
+
+	//	stars.push_back(Star(pos, vel));
+	//}
+		/*hop::vec2 direction;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) direction.x = -1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_S)) direction.y = 1;
+		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) direction.x = 1;
+
+		transform.position += direction * speed * hop::g_time.GetDeltaTime();*/
+		//this_thread::sleep_for(chrono::milliseconds(100));
+		//draw
+		//for (int i = 0; i < 1000; i++) {
+		//	hop::Vexctor2 pos(hop::randomf(renderer.GetWidth()), hop::randomf(renderer.GetHeight()));
+		//	renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), hop::random(255));
+		//	renderer.DrawPoint(pos.x, pos.y);
+		//	//renderer.DrawLine(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()), hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
+		//}
 		/*for (auto& star : stars) {
 
 			star.update(hop::g_renderer.GetWidth(), hop::g_renderer.GetHeight());
@@ -156,20 +171,3 @@ int main(int argc, char* argv[])
 			hop::g_renderer.SetColor(o,o,o, 255);
 			star.Draw(hop::g_renderer);
 		}*/
-
-		hop::g_renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
-		scene.Draw(hop::g_renderer);
-		//draw
-		//for (int i = 0; i < 1000; i++) {
-		//	hop::Vexctor2 pos(hop::randomf(renderer.GetWidth()), hop::randomf(renderer.GetHeight()));
-		//	renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), hop::random(255));
-		//	renderer.DrawPoint(pos.x, pos.y);
-		//	//renderer.DrawLine(hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()), hop::random(renderer.GetWidth()), hop::random(renderer.GetHeight()));
-		//}
-		hop::g_renderer.EndFrame();
-
-		//this_thread::sleep_for(chrono::milliseconds(100));
-	}
-
-	return 0;
-}

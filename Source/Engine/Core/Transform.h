@@ -8,10 +8,10 @@ namespace hop
 	public:
 		vec2 position;
 		float rotation;
-		float scale;
+		float scale = 1;
 
 	public:
-		Transform(const vec2& position, float  rotation, float scale = 1) :
+		Transform(const vec2& position, float  rotation, float scale) :
 			position{ position },
 			rotation{ rotation },
 			scale{ scale } {}
