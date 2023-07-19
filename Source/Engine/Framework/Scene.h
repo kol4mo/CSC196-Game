@@ -14,12 +14,14 @@ namespace hop
 		void Update(float dt);
 		void Draw(Renderer& renderer);
 
-		void Add(Actor* actor);
-		void Remove(Actor* actor);
+		int getLength() { return m_actors.size(); }
+
+		void Add(std::unique_ptr<Actor> actor);
+		void Remove(std::unique_ptr<Actor> actor);
 		void RemoveAll();
 
 
 	private:
-		std::list<Actor*> m_actors;
+		std::list<std::unique_ptr<Actor>> m_actors;
 	};
 }

@@ -11,6 +11,7 @@
 #include <chrono>
 #include <vector>
 #include <thread>
+#include <memory>
 
 using namespace std;
 
@@ -42,6 +43,11 @@ public :
 
 int main(int argc, char* argv[])
 {
+	{
+		//std::unique_ptr<int> up = std::make_unique<int>(10);
+	}
+
+	hop::g_memoryTracker.DisplayInfo();
 
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
@@ -58,53 +64,49 @@ int main(int argc, char* argv[])
 
 
 	hop::Scene scene;
+	scene.Add(move(make_unique<Player>(300.0f, 0, hop::Transform{ {400, 300}, 0, 6 }, model)));
 
-	scene.Add(new Player{ 300, 0, {{400, 300}, 0, 6}, model });
-
-	std::vector<Enemy> enemies;
 	for (int i = 0; i < 10; i++) {
-		scene.Add(new Enemy{ 200, 0, {{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomDir(), 3}, model });
+		scene.Add(move(make_unique<Enemy>( 200, 0, hop::Transform{{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomDir(), 3}, model )));
 	}
 	//Main game loop
 	bool quit = false;
+	bool end = false;
+	int enemies = 1;
 	while (!quit)
 	{
-
-
-
-		hop::g_time.tick();
-		hop::g_inputSystem.Update();
-		hop::g_audioSystem.Update();
 		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
 		{
 			quit = true;
 		}
-		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !hop::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE))
-		{
-			hop::g_audioSystem.PlayOneShot("explode");
-		}
 
-		scene.Update(hop::g_time.GetDeltaTime());
 		
+		while (!end) {
+			hop::g_time.tick();
+			hop::g_inputSystem.Update();
+			hop::g_audioSystem.Update();
+			if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
+			{
+				quit = true;
+				end = true;
+			}
+			hop::g_renderer.SetColor(0, 0, 0, 255);
+			hop::g_renderer.BeginFrame();
 
-		if (hop::g_inputSystem.GetMouseButtonDown(0)) {
-			cout << "left mouse pressed" << endl;
+			scene.Update(hop::g_time.GetDeltaTime());
+
+			scene.Draw(hop::g_renderer);
+			hop::g_renderer.EndFrame();
+			if (scene.getLength() == 1) {
+				end = true;
+			}
 		}
-		cout << hop::g_inputSystem.GetMousePosition().x << " " << hop::g_inputSystem.GetMousePosition().y << endl;
-
-		hop::g_renderer.SetColor(0, 0, 0, 255);
-		hop::g_renderer.BeginFrame();
-
-
-		hop::Vexctor2 vel(1.5f, 0.1f);
-
-
-
-		hop::g_renderer.SetColor(hop::random(255), hop::random(255), hop::random(255), 255);
-		scene.Draw(hop::g_renderer);
-		hop::g_renderer.EndFrame();
 
 	}
+
+	scene.RemoveAll();
+
+	hop::g_memoryTracker.DisplayInfo();
 
 	return 0;
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/core.h"
 #include "Renderer/Model.h"
-#include "Scene.h"
 
 namespace hop
 {
@@ -18,7 +17,7 @@ namespace hop
 		virtual void Update(float dt) = 0;
 		virtual void Draw(hop::Renderer& renderer);
 
-
+		friend class Scene;
 		class Scene* m_scene = nullptr;
 
 	protected:

@@ -18,5 +18,6 @@ namespace hop
 
 	private:
 		std::vector<vec2> m_points;
+		Color m_color;
 	};
 }
