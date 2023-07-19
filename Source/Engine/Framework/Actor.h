@@ -14,14 +14,17 @@ namespace hop
 		{}
 
 
-		virtual void Update(float dt) = 0;
+		virtual void Update(float dt);
 		virtual void Draw(hop::Renderer& renderer);
 
 		friend class Scene;
 		class Scene* m_scene = nullptr;
+		hop::Transform m_transform;
 
 	protected:
-		hop::Transform m_transform;
+		bool m_destroyed = false;
+		float m_lifespan = -1.0f;
+
 		hop::Model m_model;
 	};
 }

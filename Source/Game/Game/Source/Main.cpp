@@ -43,11 +43,8 @@ public :
 
 int main(int argc, char* argv[])
 {
-	{
-		//std::unique_ptr<int> up = std::make_unique<int>(10);
-	}
 
-	hop::g_memoryTracker.DisplayInfo();
+	hop::MemoryTracker::Initialize();
 
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
@@ -66,13 +63,11 @@ int main(int argc, char* argv[])
 	hop::Scene scene;
 	scene.Add(move(make_unique<Player>(300.0f, 0, hop::Transform{ {400, 300}, 0, 6 }, model)));
 
-	for (int i = 0; i < 10; i++) {
-		scene.Add(move(make_unique<Enemy>( 200, 0, hop::Transform{{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomDir(), 3}, model )));
-	}
 	//Main game loop
 	bool quit = false;
 	bool end = false;
-	int enemies = 1;
+	int x = 1;
+
 	while (!quit)
 	{
 		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
@@ -80,7 +75,11 @@ int main(int argc, char* argv[])
 			quit = true;
 		}
 
-		
+		for (int i = 0; i < (x); i++) {
+			scene.Add(move(make_unique<Enemy>(200, 0, hop::Transform{{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomDir(), 3}, model)));
+		}
+
+		end = false;
 		while (!end) {
 			hop::g_time.tick();
 			hop::g_inputSystem.Update();
@@ -101,12 +100,11 @@ int main(int argc, char* argv[])
 				end = true;
 			}
 		}
+		x++;
 
 	}
 
 	scene.RemoveAll();
-
-	hop::g_memoryTracker.DisplayInfo();
 
 	return 0;
 }

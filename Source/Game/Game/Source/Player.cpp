@@ -6,6 +6,8 @@
 
 void Player::Update(float dt)
 {
+
+	Actor::Update(dt);
 	hop::vec2 forward = hop::vec2{ 0,0 };
 	if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_A)) forward += {-1, 0};
 	if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_D)) forward += {1, 0};
