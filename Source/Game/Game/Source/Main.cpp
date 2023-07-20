@@ -6,6 +6,8 @@
 #include "Audio/AudioSystem.h"
 #include "Player.h"	
 #include "Framework/Scene.h"
+#include "Renderer/Font.h"
+#include "Renderer/Text.h"
 
 #include <iostream>
 #include <chrono>
@@ -55,6 +57,7 @@ int main(int argc, char* argv[])
 	hop::g_audioSystem.Initialize();
 	hop::g_inputSystem.Initialize();
 	hop::g_audioSystem.AddAudio("explode", "explode.wav");
+	std::shared_ptr<hop::Font> font = std::make_shared<hop::Font>("Arcade.ttf", 58);
 
 	hop::Model model;
 	model.Load("S.txt");
@@ -62,6 +65,9 @@ int main(int argc, char* argv[])
 
 	hop::Scene scene;
 	scene.Add(move(make_unique<Player>(300.0f, 0, hop::Transform{ {400, 300}, 0, 6 }, model)));
+
+	std::unique_ptr<hop::Text> text = std::make_unique<hop::Text>(font);
+	text->Create(hop::g_renderer, "NEUMONT", hop::Color( 1, 1, 1, 1 ));
 
 	//Main game loop
 	bool quit = false;
@@ -93,7 +99,7 @@ int main(int argc, char* argv[])
 			hop::g_renderer.BeginFrame();
 
 			scene.Update(hop::g_time.GetDeltaTime());
-
+			text->Draw(hop::g_renderer, 400, 300);
 			scene.Draw(hop::g_renderer);
 			hop::g_renderer.EndFrame();
 			if (scene.getLength() == 1) {
