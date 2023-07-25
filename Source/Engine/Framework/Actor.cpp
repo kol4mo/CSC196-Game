@@ -11,6 +11,6 @@ namespace hop
 
 	void Actor::Draw(hop::Renderer& renderer)
 	{
-		m_model.Draw(renderer, m_transform);
+		m_model->Draw(renderer, m_transform);
 	}
 }

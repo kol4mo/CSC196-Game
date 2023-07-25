@@ -2,6 +2,7 @@
 #include "Input/InputSystem.h"
 #include "Weapon.h"
 #include "Framework/Scene.h"
+#include "FunGame.h"
 #include <cmath>
 
 void Player::Update(float dt)
@@ -27,6 +28,14 @@ void Player::Update(float dt)
 		hop::Transform transform{m_transform.position, m_transform.rotation, 1};
 		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>( 400.0f, m_transform, m_model );
 		m_scene->Add(std::move(weapon));
+	}
+}
+
+void Player::OnCollision(Actor* actor)
+{
+	if (actor->m_tag == "Enemy") {
+		//m_game->SetLives(m_game->GetLives() - 1);
+		//dynamic_cast<SpaceGame*>(m_game)->SetState(FunGame::)
 	}
 }
 

@@ -1,6 +1,6 @@
 #include "Core/core.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Model.h"
+#include "Renderer/ModelManager.h"
 #include "Input/InputSystem.h"
 #include "Enemy.h"
 #include "Audio/AudioSystem.h"
@@ -8,7 +8,7 @@
 #include "Framework/Scene.h"
 #include "Renderer/Font.h"
 #include "Renderer/Text.h"
-
+#include "FunGame.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -51,23 +51,17 @@ int main(int argc, char* argv[])
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
 
-
-	hop::g_renderer.Initialize();
-	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
 	hop::g_audioSystem.Initialize();
 	hop::g_inputSystem.Initialize();
-	hop::g_audioSystem.AddAudio("explode", "explode.wav");
-	std::shared_ptr<hop::Font> font = std::make_shared<hop::Font>("Arcade.ttf", 58);
+	hop::g_renderer.Initialize();
+	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
 
-	hop::Model model;
-	model.Load("S.txt");
+	unique_ptr<FunGame> game = make_unique<FunGame>();
+	game->Initialize();
+
+	
 
 
-	hop::Scene scene;
-	scene.Add(move(make_unique<Player>(300.0f, 0, hop::Transform{ {400, 300}, 0, 6 }, model)));
-
-	std::unique_ptr<hop::Text> text = std::make_unique<hop::Text>(font);
-	text->Create(hop::g_renderer, "NEUMONT", hop::Color( 1, 1, 1, 1 ));
 
 	//Main game loop
 	bool quit = false;
@@ -76,42 +70,41 @@ int main(int argc, char* argv[])
 
 	while (!quit)
 	{
+
+		hop::g_time.tick();
+		hop::g_inputSystem.Update();
+		hop::g_audioSystem.Update();
 		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
 		{
 			quit = true;
 		}
 
-		for (int i = 0; i < (x); i++) {
-			scene.Add(move(make_unique<Enemy>(200, 0, hop::Transform{{hop::random(hop::g_renderer.GetWidth()), hop::random(hop::g_renderer.GetHeight())}, hop::randomDir(), 3}, model)));
-		}
 
-		end = false;
-		while (!end) {
-			hop::g_time.tick();
-			hop::g_inputSystem.Update();
-			hop::g_audioSystem.Update();
-			if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
-			{
-				quit = true;
-				end = true;
-			}
-			hop::g_renderer.SetColor(0, 0, 0, 255);
-			hop::g_renderer.BeginFrame();
 
-			scene.Update(hop::g_time.GetDeltaTime());
-			text->Draw(hop::g_renderer, 400, 300);
-			scene.Draw(hop::g_renderer);
-			hop::g_renderer.EndFrame();
-			if (scene.getLength() == 1) {
-				end = true;
-			}
-		}
-		x++;
+		//end = false;
+		//while (!end) {
+		//	if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
+		//	{
+		//		quit = true;
+		//		end = true;
+		//	}
+		hop::g_renderer.SetColor(0, 0, 0, 255);
+		hop::g_renderer.BeginFrame();
+
+		game->update(hop::g_time.GetDeltaTime());
+			//text->Draw(hop::g_renderer, 400, 300);
+		game->draw(hop::g_renderer);
+		hop::g_renderer.EndFrame();
+		//	if (scene.getLength() == 1) {
+		//		end = true;
+		//	}
+		//}
+		//x++;
 
 	}
 
-	scene.RemoveAll();
-
+	//scene.RemoveAll();
+	hop::MemoryTracker::DisplayInfo();
 	return 0;
 }
 	//vector<Star> stars;

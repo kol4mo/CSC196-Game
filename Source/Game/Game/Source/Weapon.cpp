@@ -8,3 +8,8 @@ void Weapon::Update(float dt)
 	m_transform.position.x = hop::Wrap(m_transform.position.x, (float)hop::g_renderer.GetWidth());
 	m_transform.position.y = hop::Wrap(m_transform.position.y, (float)hop::g_renderer.GetHeight());
 }
+
+void Weapon::OnCollision(Actor* actor)
+{
+	m_destroyed = true;
+}

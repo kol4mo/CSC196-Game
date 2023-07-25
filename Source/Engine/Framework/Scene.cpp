@@ -9,10 +9,21 @@ namespace hop
 		}
 
 		auto iter = m_actors.begin();
-		while (iter != m_actors.end()) {
-			if (iter->get()->m_destroyed) iter = m_actors.erase(iter);
-			else iter++;
+		while (iter != m_actors.end())
+			iter = ((*iter)->m_destroyed) ? m_actors.erase(iter) : ++iter;
 
+
+		for (auto iter1 = m_actors.begin(); iter1 != m_actors.end(); iter1++) {
+			for (auto iter2 = std::next(iter1, 1); iter2 != m_actors.end(); iter2++) {
+				float distance = (*iter1)->m_transform.position.Distance((*iter2)->m_transform.position);
+				float radius = (*iter1)->m_model->getRadius() + (*iter2)->m_model->getRadius();
+
+				if (distance <= radius)
+				{
+					(*iter1)->OnCollision(iter2->get());
+					(*iter2)->OnCollision(iter1->get());
+				}
+			}
 		}
 
 	}
