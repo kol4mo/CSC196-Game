@@ -28,6 +28,7 @@ void Player::Update(float dt)
 		hop::Transform transform{m_transform.position, m_transform.rotation, 1};
 		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>( 400.0f, m_transform, m_model );
 		m_scene->Add(std::move(weapon));
+
 	}
 }
 

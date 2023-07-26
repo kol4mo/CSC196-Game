@@ -3,12 +3,13 @@
 #include "Enemy.h"
 
 #include "Framework//Scene.h"
-
+#include "Core/core.h"
 #include "Audio/AudioSystem.h"
 #include "Input/InputSystem.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Text.h"
 #include "Renderer/ModelManager.h"
+#include "Framework/Emitter.h"
 
 bool FunGame::Initialize()
 {
@@ -17,8 +18,6 @@ bool FunGame::Initialize()
 
 	m_scoreText = std::make_unique<hop::Text>(m_font);
 	m_scoreText->Create(hop::g_renderer, "SCORE 0000", hop::Color(1, 1, 1, 1));
-
-
 	hop::g_audioSystem.AddAudio("explode", "explode.wav");
 
 	m_scene = std::make_unique<hop::Scene>();
@@ -59,8 +58,26 @@ void FunGame::update(float dt)
 	}
 	m_state = eState::Game;
 		break;
-	case FunGame::eState::Game:
+	case FunGame::eState::Game: {
+		hop::EmitterData data;
+		data.burst = true;
+		data.burstCount = 100;
+		data.spawnRate = 200;
+		data.angle = 0;
+		data.angleRange = hop::PI;
+		data.lifetimeMin = 0.5f;
+		data.lifetimeMin = 1.5f;
+		data.speedMin = 50;
+		data.speedMax = 250;
+		data.damping = 0.5f;
+		data.color = hop::Color{ 1, 0, 0, 1 };
+		hop::Transform transform{ { hop::g_inputSystem.GetMousePosition() }, 0, 1 };
+		auto emitter = std::make_unique<hop::Emitter>(transform, data);
+		emitter->m_lifespan = 1.0f;
+		m_scene->Add(std::move(emitter));
+
 		AddPoints(7);
+	}
 		break;
 	case FunGame::eState::PlayerDead:
 		if (m_lives == 0) m_state = eState::GameOver;
@@ -75,6 +92,7 @@ void FunGame::update(float dt)
 	m_scoreText->Create(hop::g_renderer, std::to_string(m_score), { 1, 1, 1, 1 });
 
 	m_scene->Update(dt);
+	hop::g_particleSystem.Update(dt);
 }
 
 void FunGame::draw(hop::Renderer& renderer)
@@ -85,5 +103,6 @@ void FunGame::draw(hop::Renderer& renderer)
 
 	m_scoreText->Draw(renderer, 40, 40);
 
+	hop::g_particleSystem.Draw(renderer);
 	m_scene->Draw(renderer);
 }
