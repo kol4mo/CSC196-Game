@@ -9,6 +9,7 @@
 #include "Renderer/Font.h"
 #include "Renderer/Text.h"
 #include "FunGame.h"
+#include "Renderer/ParticleSystem.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -51,10 +52,11 @@ int main(int argc, char* argv[])
 	hop::seedRandom((unsigned int)time(nullptr));
 	hop::setFilePath("Assets");
 
-	hop::g_audioSystem.Initialize();
-	hop::g_inputSystem.Initialize();
 	hop::g_renderer.Initialize();
 	hop::g_renderer.CreateWindow("CSC196", 1080, 540);
+
+	hop::g_inputSystem.Initialize();
+	hop::g_audioSystem.Initialize();
 
 	unique_ptr<FunGame> game = make_unique<FunGame>();
 	game->Initialize();
@@ -65,8 +67,6 @@ int main(int argc, char* argv[])
 
 	//Main game loop
 	bool quit = false;
-	bool end = false;
-	int x = 1;
 
 	while (!quit)
 	{
@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
 		hop::g_time.tick();
 		hop::g_inputSystem.Update();
 		hop::g_audioSystem.Update();
+		hop::g_particleSystem.Update(hop::g_time.GetDeltaTime());
 		if (hop::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE))
 		{
 			quit = true;
@@ -88,10 +89,10 @@ int main(int argc, char* argv[])
 		//		quit = true;
 		//		end = true;
 		//	}
+		game->update(hop::g_time.GetDeltaTime());
 		hop::g_renderer.SetColor(0, 0, 0, 255);
 		hop::g_renderer.BeginFrame();
 
-		game->update(hop::g_time.GetDeltaTime());
 			//text->Draw(hop::g_renderer, 400, 300);
 		game->draw(hop::g_renderer);
 		hop::g_renderer.EndFrame();

@@ -1,5 +1,6 @@
 #pragma once
 #include "Framework/Actor.h"
+#include "Core/Vexctor2.h"
 
 
 	class Enemy : public hop::Actor
@@ -16,6 +17,7 @@
 		void Update(float dt) override;
 		void OnCollision(Actor* actor) override;
 
+		hop::Transform randomWallPos(float scale);
 	private:
 		float m_speed = 0;
 		float m_turnRate = 0;

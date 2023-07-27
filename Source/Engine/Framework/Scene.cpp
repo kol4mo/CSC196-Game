@@ -43,4 +43,13 @@ namespace hop
 	{
 		m_actors.clear();
 	}
+
+	Actor* Scene::GetActor(std::string tag)
+	{
+		for (auto& actor : m_actors) {
+			Actor* result = dynamic_cast<Actor*> (actor.get());
+			if (result && actor->m_tag == tag) return result;
+		}
+		return nullptr;
+	}
 }

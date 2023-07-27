@@ -24,11 +24,14 @@ namespace hop
 		float GetRadius() { return (m_model) ? m_model->getRadius() * m_transform.scale : 0; }
 		virtual void OnCollision(Actor* other) {};
 
-		friend class Scene;
-
-		class game* m_game = nullptr;
+		void addForce(const vec2& force) { m_velocity += force; }
+		void SetDamping(float damping) { m_damping = damping; }
 
 		class Scene* m_scene = nullptr;
+		friend class Scene;
+
+		class Game* m_game = nullptr;
+
 		hop::Transform m_transform;
 		std::string m_tag;
 
@@ -37,5 +40,8 @@ namespace hop
 		bool m_destroyed = false;
 
 		std::shared_ptr<hop::Model> m_model;
+
+		vec2 m_velocity;
+		float m_damping = 0;
 	};
 }

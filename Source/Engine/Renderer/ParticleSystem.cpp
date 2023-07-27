@@ -1,6 +1,7 @@
 #include "ParticleSystem.h"
 namespace hop {
-    ParticleSystem g_particleSystem;
+
+    ParticleSystem g_particleSystem(10000);
 
     void hop::ParticleSystem::Update(float dt)
     {

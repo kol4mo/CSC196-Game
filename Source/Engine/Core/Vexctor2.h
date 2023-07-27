@@ -42,7 +42,13 @@ namespace hop
 
 		float Angle() const { return std::atan2f(y, x); }
 		Vexctor2 Rotate(float radians) const;
+
+		static float SignedAngle(const Vexctor2& v1, const Vexctor2& v2);
+		static float Angle(const Vexctor2& v1, const Vexctor2& v2);
+		static float Dot(const Vexctor2& v1, const Vexctor2& v2);
 	};
+
+
 
 	inline Vexctor2 Vexctor2::Rotate(float radians) const
 	{
@@ -52,7 +58,26 @@ namespace hop
 		return { _x, _y };
 	}
 
+	// get the unsigned angle in radians between the normalized v1 and normalized v2
+	inline float Vexctor2::Angle(const Vexctor2& v1, const Vexctor2& v2)
+	{
+		return std::acos(Dot(v1, v2));
+	}
 
+	// get the signed counterclockwise angle in radians between v1 and v2
+	inline float Vexctor2::SignedAngle(const Vexctor2& v1, const Vexctor2& v2)
+	{
+		float y = v1.x * v2.y - v1.y * v2.x;
+		float x = v1.x * v2.x + v1.y * v2.y;
+
+		return std::atan2(y, x);
+	}
+
+	// get the dot product beteen v1 and v2 https://www.falstad.com/dotproduct/
+	inline float Vexctor2::Dot(const Vexctor2& v1, const Vexctor2& v2)
+	{
+		return v1.x * v2.x + v1.y * v2.y;
+	}
 
 	inline std::istream& operator >> (std::istream& stream, Vexctor2& v)
 	{

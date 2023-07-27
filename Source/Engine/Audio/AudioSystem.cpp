@@ -30,13 +30,15 @@ namespace hop
 			m_sounds[name] = sound;
 		}
 	}
-	void AudioSystem::PlayOneShot(const std::string& name)
+	void AudioSystem::PlayOneShot(const std::string& name, bool loop)
 	{
 		auto iter = m_sounds.find(name);
 		if (iter != m_sounds.end())
 		{
 			FMOD::Sound* sound = iter->second;
-			sound->setMode(FMOD_LOOP_OFF);
+			if (loop)sound->setMode(FMOD_LOOP_NORMAL);
+			else sound->setMode(FMOD_LOOP_OFF);
+
 			FMOD::Channel* channel;
 			m_fmodSystem->playSound(sound, 0, false, &channel);
 		}
